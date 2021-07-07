@@ -23,6 +23,7 @@ import directoryForTempInjectable from "../../../common/app-paths/directory-for-
 import kubectlBinaryNameInjectable from "../../kubectl/binary-name.injectable";
 import kubectlDownloadingNormalizedArchInjectable from "../../kubectl/normalized-arch.injectable";
 import normalizedPlatformInjectable from "../../../common/vars/normalized-platform.injectable";
+import readFileSyncInjectable from "../../../common/fs/read-file-sync.injectable";
 
 jest.mock("electron", () => ({
   app: {
@@ -53,6 +54,7 @@ describe("kubeconfig-sync.source tests", () => {
     di.override(kubectlBinaryNameInjectable, () => "kubectl");
     di.override(kubectlDownloadingNormalizedArchInjectable, () => "amd64");
     di.override(normalizedPlatformInjectable, () => "darwin");
+    di.override(readFileSyncInjectable, () => fs.readFileSync);
 
     di.override(clusterStoreInjectable, () =>
       ClusterStore.createInstance({ createCluster: () => null as never }),

@@ -6,7 +6,7 @@
 import fs from "fs";
 import mockFs from "mock-fs";
 import path from "path";
-import fse from "fs-extra";
+import fse, { readFileSync } from "fs-extra";
 import type { Cluster } from "../cluster/cluster";
 import type { ClusterStore } from "../cluster-store/cluster-store";
 import { Console } from "console";
@@ -25,6 +25,7 @@ import directoryForTempInjectable from "../app-paths/directory-for-temp/director
 import kubectlBinaryNameInjectable from "../../main/kubectl/binary-name.injectable";
 import kubectlDownloadingNormalizedArchInjectable from "../../main/kubectl/normalized-arch.injectable";
 import normalizedPlatformInjectable from "../vars/normalized-platform.injectable";
+import readFileSyncInjectable from "../fs/read-file-sync.injectable";
 
 console = new Console(stdout, stderr);
 
@@ -90,6 +91,7 @@ describe("cluster-store", () => {
     mainDi.override(kubectlBinaryNameInjectable, () => "kubectl");
     mainDi.override(kubectlDownloadingNormalizedArchInjectable, () => "amd64");
     mainDi.override(normalizedPlatformInjectable, () => "darwin");
+    mainDi.override(readFileSyncInjectable, () => readFileSync); // TODO: don't bypass injectables
 
     mainDi.permitSideEffects(getConfigurationFileModelInjectable);
     mainDi.permitSideEffects(appVersionInjectable);
