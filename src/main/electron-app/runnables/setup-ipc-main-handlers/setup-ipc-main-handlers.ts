@@ -10,8 +10,6 @@ import type { ClusterId } from "../../../../common/cluster-types";
 import { ClusterStore } from "../../../../common/cluster-store/cluster-store";
 import { appEventBus } from "../../../../common/app-event-bus/event-bus";
 import { broadcastMainChannel, broadcastMessage, ipcMainHandle, ipcMainOn } from "../../../../common/ipc";
-import type { CatalogEntityRegistry } from "../../../catalog";
-import { pushCatalogToRenderer } from "../../../catalog-pusher";
 import type { ClusterManager } from "../../../cluster-manager";
 import { ResourceApplier } from "../../../resource-applier";
 import { remove } from "fs-extra";
@@ -30,13 +28,12 @@ interface Dependencies {
   getAbsolutePath: GetAbsolutePath;
   applicationMenuItems: IComputedValue<MenuItemOpts[]>;
   clusterManager: ClusterManager;
-  catalogEntityRegistry: CatalogEntityRegistry;
   clusterStore: ClusterStore;
   operatingSystemTheme: IComputedValue<Theme>;
   askUserForFilePaths: AskUserForFilePaths;
 }
 
-export const setupIpcMainHandlers = ({ applicationMenuItems, directoryForLensLocalStorage, getAbsolutePath, clusterManager, catalogEntityRegistry, clusterStore, operatingSystemTheme, askUserForFilePaths }: Dependencies) => {
+export const setupIpcMainHandlers = ({ applicationMenuItems, directoryForLensLocalStorage, getAbsolutePath, clusterManager, clusterStore, operatingSystemTheme, askUserForFilePaths }: Dependencies) => {
   ipcMainHandle(clusterActivateHandler, (event, clusterId: ClusterId, force = false) => {
     return ClusterStore.getInstance()
       .getById(clusterId)
@@ -49,8 +46,6 @@ export const setupIpcMainHandlers = ({ applicationMenuItems, directoryForLensLoc
     if (cluster) {
       clusterFrameMap.set(cluster.id, { frameId: event.frameId, processId: event.processId });
       cluster.pushState();
-
-      pushCatalogToRenderer(catalogEntityRegistry);
     }
   });
 

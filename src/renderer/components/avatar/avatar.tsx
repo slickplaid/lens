@@ -5,21 +5,17 @@
 
 import styles from "./avatar.module.scss";
 
-import type { ImgHTMLAttributes, MouseEventHandler } from "react";
+import type { HTMLAttributes, MouseEventHandler } from "react";
 import React from "react";
 import randomColor from "randomcolor";
-import GraphemeSplitter from "grapheme-splitter";
 import type { SingleOrMany } from "../../utils";
-import { cssNames, isDefined, iter } from "../../utils";
+import { cssNames } from "../../utils";
 
-export interface AvatarProps {
-  title: string;
+export interface AvatarProps extends HTMLAttributes<HTMLElement> {
   colorHash?: string;
   size?: number;
-  src?: string;
   background?: string;
   variant?: "circle" | "rounded" | "square";
-  imgProps?: ImgHTMLAttributes<HTMLImageElement>;
   disabled?: boolean;
   children?: SingleOrMany<React.ReactNode>;
   className?: string;
@@ -28,54 +24,15 @@ export interface AvatarProps {
   "data-testid"?: string;
 }
 
-function getNameParts(name: string): string[] {
-  const byWhitespace = name.split(/\s+/);
-
-  if (byWhitespace.length > 1) {
-    return byWhitespace;
-  }
-
-  const byDashes = name.split(/[-_]+/);
-
-  if (byDashes.length > 1) {
-    return byDashes;
-  }
-
-  return name.split(/@+/);
-}
-
-function getLabelFromTitle(title: string) {
-  if (!title) {
-    return "??";
-  }
-
-  const [rawFirst, rawSecond, rawThird] = getNameParts(title);
-  const splitter = new GraphemeSplitter();
-  const first = splitter.iterateGraphemes(rawFirst);
-  const second = rawSecond ? splitter.iterateGraphemes(rawSecond): first;
-  const third = rawThird ? splitter.iterateGraphemes(rawThird) : iter.newEmpty();
-
-  return [
-    ...iter.take(first, 1),
-    ...iter.take(second, 1),
-    ...iter.take(third, 1),
-  ].filter(isDefined).join("");
-}
-
 export const Avatar = ({
-  title,
   variant = "rounded",
   size = 32,
   colorHash,
   children,
   background,
-  imgProps,
-  src,
   className,
   disabled,
-  id,
-  onClick,
-  "data-testid": dataTestId,
+  ...rest
 }: AvatarProps) => (
   <div
     className={cssNames(styles.Avatar, {
@@ -86,24 +43,10 @@ export const Avatar = ({
     style={{
       width: `${size}px`,
       height: `${size}px`,
-      background: background || (
-        src
-          ? "transparent"
-          : randomColor({ seed: colorHash, luminosity: "dark" })
-      ),
+      backgroundColor: background || randomColor({ seed: colorHash, luminosity: "dark" }),
     }}
-    id={id}
-    onClick={onClick}
-    data-testid={dataTestId}
+    {...rest}
   >
-    {src
-      ? (
-        <img
-          src={src}
-          {...imgProps}
-          alt={title}
-        />
-      )
-      : children || getLabelFromTitle(title)}
+    {children}
   </div>
 );

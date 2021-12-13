@@ -8,8 +8,8 @@ import type { Disposer } from "../../common/utils";
 import type { CatalogEntity } from "../common-api/catalog";
 import { BaseRegistry } from "./base-registry";
 
-export interface CatalogEntityDetailsProps<T extends CatalogEntity> {
-  entity: T;
+export interface CatalogEntityDetailsProps<Entity extends CatalogEntity> {
+  entity: Entity;
 }
 
 export interface CatalogEntityDetailComponents<T extends CatalogEntity> {

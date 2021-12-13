@@ -22,6 +22,8 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import catalogCategoryRegistryInjectable from "../../../common/catalog/category-registry.injectable";
 import visitEntityContextMenuInjectable from "../../../common/catalog/visit-entity-context-menu.injectable";
 import activeEntityInjectable from "../../api/catalog/entity/active.injectable";
+import { getIconBackground, getIconColourHash, getIconMaterial } from "../../../common/catalog/helpers";
+import { EntityIcon } from "../entity-icon";
 
 export interface HotbarEntityIconProps {
   entity: CatalogEntity;
@@ -91,16 +93,15 @@ class NonInjectedHotbarEntityIcon extends React.Component<HotbarEntityIconProps 
   }
 
   render() {
-    const { entity, className, onClick } = this.props;
+    const { entity, className, ...elemProps } = this.props;
 
     return (
       <HotbarIcon
         uid={entity.getId()}
-        title={entity.getName()}
+        colorHash={getIconColourHash(entity)}
         source={entity.metadata.source}
-        src={entity.spec.icon?.src}
-        material={entity.spec.icon?.material}
-        background={entity.spec.icon?.background}
+        material={getIconMaterial(entity)}
+        background={getIconBackground(entity)}
         className={className}
         active={this.isActive(entity)}
         onMenuOpen={() => this.onMenuOpen()}
@@ -111,7 +112,8 @@ class NonInjectedHotbarEntityIcon extends React.Component<HotbarEntityIconProps 
             ? `${entity.getName()} (${entity.metadata.source})`
             : entity.getName()
         )}
-        onClick={onClick}
+        avatarChildren={<EntityIcon entity={entity} />}
+        {...elemProps}
       >
         { this.ledIcon }
         { this.kindIcon }

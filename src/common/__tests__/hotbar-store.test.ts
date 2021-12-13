@@ -283,7 +283,7 @@ describe("HotbarStore", () => {
     });
   });
 
-  describe("given data from 5.0.0-beta.3 and version being 5.0.0-beta.10", () => {
+  describe("given data from 5.0.0-beta.3 and version being 5.6.0-alpha.1", () => {
     beforeEach(() => {
       const configurationToBeMigrated = {
         "some-directory-for-user-data": {
@@ -349,7 +349,7 @@ describe("HotbarStore", () => {
 
       mockFs(configurationToBeMigrated);
 
-      di.override(appVersionInjectable, () => "5.0.0-beta.10");
+      di.override(appVersionInjectable, () => "5.6.0-alpha.11");
 
       hotbarStore = di.inject(hotbarStoreInjectable);
 
@@ -376,6 +376,7 @@ describe("HotbarStore", () => {
           name: "my-aws-cluster",
           source: "local",
           uid: "some-aws-id",
+          shortName: "mac",
         },
       });
     });

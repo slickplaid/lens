@@ -12,7 +12,6 @@ import { getDi } from "./getDi";
 import startMainApplicationInjectable from "./start-main-application/start-main-application.injectable";
 
 const di = getDi();
-
 const startApplication = di.inject(startMainApplicationInjectable);
 
 (async () => {

@@ -8,6 +8,7 @@ import type { MigrationDeclaration } from "../helpers";
 import { getEmptyHotbar } from "../../common/hotbars/types";
 import { getLegacyGlobalDiForExtensionApi } from "../../extensions/as-legacy-globals-for-extension-api/legacy-global-di-for-extension-api";
 import catalogCatalogEntityInjectable from "../../common/catalog-entities/general-catalog-entities/implementations/catalog-catalog-entity.injectable";
+import { computeDefaultShortName } from "../../common/catalog/helpers";
 
 export default {
   version: "5.0.0-alpha.0",
@@ -18,7 +19,14 @@ export default {
 
     const { metadata: { uid, name, source }} = catalogCatalogEntity;
 
-    hotbar.items[0] = { entity: { uid, name, source }};
+    hotbar.items[0] = {
+      entity: {
+        uid,
+        name,
+        source,
+        shortName: computeDefaultShortName(name),
+      },
+    };
 
     store.set("hotbars", [hotbar]);
   },

@@ -17,9 +17,11 @@ import { Avatar } from "../avatar";
 import type { GetLabelBadges } from "./get-label-badges.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import getLabelBadgesInjectable from "./get-label-badges.injectable";
+import { getIconBackground, getIconColourHash } from "../../../common/catalog/helpers";
+import { EntityIcon } from "../entity-icon";
 
-export interface CatalogEntityDetailsProps<Entity extends CatalogEntity> {
-  entity: Entity;
+export interface CatalogEntityDetailsProps {
+  entity: CatalogEntity;
   hideDetails(): void;
   onRun: () => void;
 }
@@ -29,7 +31,7 @@ interface Dependencies {
 }
 
 @observer
-class NonInjectedCatalogEntityDetails<Entity extends CatalogEntity> extends Component<CatalogEntityDetailsProps<Entity> & Dependencies> {
+class NonInjectedCatalogEntityDetails extends Component<CatalogEntityDetailsProps & Dependencies> {
   categoryIcon(category: CatalogCategory) {
     if (Icon.isSvg(category.metadata.icon)) {
       return <Icon svg={category.metadata.icon} smallest />;
@@ -38,8 +40,8 @@ class NonInjectedCatalogEntityDetails<Entity extends CatalogEntity> extends Comp
     }
   }
 
-  renderContent(entity: Entity) {
-    const { onRun, hideDetails, getLabelBadges } = this.props;
+  renderContent(entity: CatalogEntity) {
+    const { onRun, getLabelBadges } = this.props;
     const detailItems = CatalogEntityDetailRegistry.getInstance().getItemsForKind(entity.kind, entity.apiVersion);
     const details = detailItems.map(({ components }, index) => <components.Details entity={entity} key={index} />);
     const showDefaultDetails = detailItems.find((item) => item.priority ?? 50 > 999) === undefined;
@@ -50,18 +52,16 @@ class NonInjectedCatalogEntityDetails<Entity extends CatalogEntity> extends Comp
           <div className="flex">
             <div className={styles.entityIcon}>
               <Avatar
-                title={entity.getName()}
-                colorHash={`${entity.getName()}-${entity.getSource()}`}
+                colorHash={getIconColourHash(entity)}
                 size={128}
-                src={entity.spec.icon?.src}
                 data-testid="detail-panel-hot-bar-icon"
-                background={entity.spec.icon?.background}
+                background={getIconBackground(entity)}
                 onClick={onRun}
                 className={styles.avatar}
               >
-                {entity.spec.icon?.material && <Icon material={entity.spec.icon?.material}/>}
+                <EntityIcon entity={entity} />
               </Avatar>
-              {entity.isEnabled() && (
+              {entity?.isEnabled() && (
                 <div className={styles.hint}>
                   Click to open
                 </div>
@@ -81,7 +81,7 @@ class NonInjectedCatalogEntityDetails<Entity extends CatalogEntity> extends Comp
                 {entity.status.phase}
               </DrawerItem>
               <DrawerItem name="Labels">
-                {getLabelBadges(entity, hideDetails)}
+                {...getLabelBadges(entity, this.props.hideDetails)}
               </DrawerItem>
               {isDevelopment && (
                 <DrawerItem name="Id">
@@ -116,9 +116,9 @@ class NonInjectedCatalogEntityDetails<Entity extends CatalogEntity> extends Comp
   }
 }
 
-export const CatalogEntityDetails = withInjectables<Dependencies, CatalogEntityDetailsProps<CatalogEntity>>(NonInjectedCatalogEntityDetails, {
+export const CatalogEntityDetails = withInjectables<Dependencies, CatalogEntityDetailsProps>(NonInjectedCatalogEntityDetails, {
   getProps: (di, props) => ({
     ...props,
     getLabelBadges: di.inject(getLabelBadgesInjectable),
   }),
-}) as <Entity extends CatalogEntity>(props: CatalogEntityDetailsProps<Entity>) => React.ReactElement;
+});

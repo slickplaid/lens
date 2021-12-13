@@ -321,7 +321,7 @@ export interface CatalogEntityAddMenuContext {
   menuItems: CatalogEntityAddMenu[];
 }
 
-export type CatalogEntitySpec = Record<string, any>;
+export type CatalogEntitySpec = Partial<Record<string, unknown>>;
 
 
 export interface CatalogEntityData<

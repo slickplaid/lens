@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import type { CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus } from "../catalog";
+import type { CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntitySpec, CatalogEntityStatus } from "../catalog";
 import { CatalogCategory, CatalogEntity, categoryVersion } from "../catalog/catalog-entity";
 import { productName } from "../vars";
 import { WeblinkStore } from "../weblink-store";
@@ -14,7 +14,7 @@ export interface WebLinkStatus extends CatalogEntityStatus {
   phase: WebLinkStatusPhase;
 }
 
-export interface WebLinkSpec {
+export interface WebLinkSpec extends CatalogEntitySpec {
   url: string;
 }
 
@@ -22,10 +22,10 @@ export class WebLink extends CatalogEntity<CatalogEntityMetadata, WebLinkStatus,
   public static readonly apiVersion = "entity.k8slens.dev/v1alpha1";
   public static readonly kind = "WebLink";
 
-  public readonly apiVersion = WebLink.apiVersion;
-  public readonly kind = WebLink.kind;
+  public readonly apiVersion: string = WebLink.apiVersion;
+  public readonly kind: string = WebLink.kind;
 
-  async onRun() {
+  onRun() {
     window.open(this.spec.url, "_blank");
   }
 

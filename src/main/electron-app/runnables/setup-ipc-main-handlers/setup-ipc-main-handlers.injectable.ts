@@ -12,7 +12,6 @@ import getAbsolutePathInjectable from "../../../../common/path/get-absolute-path
 import clusterStoreInjectable from "../../../../common/cluster-store/cluster-store.injectable";
 import { onLoadOfApplicationInjectionToken } from "../../../start-main-application/runnable-tokens/on-load-of-application-injection-token";
 import operatingSystemThemeInjectable from "../../../theme/operating-system-theme.injectable";
-import catalogEntityRegistryInjectable from "../../../catalog/entity-registry.injectable";
 import askUserForFilePathsInjectable from "../../../ipc/ask-user-for-file-paths.injectable";
 
 const setupIpcMainHandlersInjectable = getInjectable({
@@ -20,15 +19,10 @@ const setupIpcMainHandlersInjectable = getInjectable({
 
   instantiate: (di) => {
     const logger = di.inject(loggerInjectable);
-
-    const directoryForLensLocalStorage = di.inject(
-      directoryForLensLocalStorageInjectable,
-    );
-
+    const directoryForLensLocalStorage = di.inject(directoryForLensLocalStorageInjectable);
     const clusterManager = di.inject(clusterManagerInjectable);
     const applicationMenuItems = di.inject(applicationMenuItemsInjectable);
     const getAbsolutePath = di.inject(getAbsolutePathInjectable);
-    const catalogEntityRegistry = di.inject(catalogEntityRegistryInjectable);
     const clusterStore = di.inject(clusterStoreInjectable);
     const operatingSystemTheme = di.inject(operatingSystemThemeInjectable);
     const askUserForFilePaths = di.inject(askUserForFilePathsInjectable);
@@ -42,7 +36,6 @@ const setupIpcMainHandlersInjectable = getInjectable({
           getAbsolutePath,
           directoryForLensLocalStorage,
           clusterManager,
-          catalogEntityRegistry,
           clusterStore,
           operatingSystemTheme,
           askUserForFilePaths,
