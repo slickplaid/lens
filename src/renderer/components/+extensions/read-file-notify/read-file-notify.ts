@@ -7,7 +7,7 @@ import { getMessageFromError } from "../get-message-from-error/get-message-from-
 import logger from "../../../../main/logger";
 import { Notifications } from "../../notifications";
 
-export const readFileNotify = async (filePath: string, showError = true): Promise<Buffer | null> => {
+export async function readFileNotify(filePath: string, showError = true): Promise<Buffer | null> {
   try {
     return await fse.readFile(filePath);
   } catch (error) {
@@ -20,4 +20,4 @@ export const readFileNotify = async (filePath: string, showError = true): Promis
   }
 
   return null;
-};
+}

@@ -13,10 +13,9 @@ import { Input, InputValidators } from "../input";
 import { SubTitle } from "../layout/sub-title";
 import { TooltipPosition } from "../tooltip";
 import type { ExtensionInstallationStateStore } from "../../../extensions/extension-installation-state-store/extension-installation-state-store";
-import extensionInstallationStateStoreInjectable
-  from "../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
+import extensionInstallationStateStoreInjectable from "../../../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import { inputValidator } from "../input/input_validators";
+import { AsyncInputValidationError, asyncInputValidator } from "../input/input_validators";
 
 export interface InstallProps {
   installPath: string;
@@ -30,17 +29,24 @@ interface Dependencies {
   extensionInstallationStateStore: ExtensionInstallationStateStore;
 }
 
-const installInputValidators = [
-  InputValidators.isUrl,
-  InputValidators.isPath,
-  InputValidators.isExtensionNameInstall,
-];
+const installInputValidator = asyncInputValidator({
+  validate: async (value: string) => {
+    if (
+      InputValidators.isUrl.validate(value)
+      || InputValidators.isExtensionNameInstall.validate(value)
+    ) {
+      return;
+    }
 
-const installInputValidator = inputValidator({
-  message: "Invalid URL, absolute path, or extension name",
-  validate: (value: string, props) => (
-    installInputValidators.some(({ validate }) => validate(value, props))
-  ),
+    try {
+      await InputValidators.isPath.validate(value);
+    } catch {
+      // do nothing
+    }
+
+    throw new AsyncInputValidationError("Invalid URL, absolute path, or extension name");
+  },
+  debounce: InputValidators.isPath.debounce,
 });
 
 const NonInjectedInstall: React.FC<Dependencies & InstallProps> = ({
@@ -62,9 +68,7 @@ const NonInjectedInstall: React.FC<Dependencies & InstallProps> = ({
         <Input
           className="box grow mr-6"
           theme="round-black"
-          disabled={
-            extensionInstallationStateStore.anyPreInstallingOrInstalling
-          }
+          disabled={extensionInstallationStateStore.anyPreInstallingOrInstalling}
           placeholder={"Name or file path or URL"}
           showErrorsAsTooltip={{ preferredPositions: TooltipPosition.BOTTOM }}
           validators={installPath ? installInputValidator : undefined}

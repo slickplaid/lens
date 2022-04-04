@@ -12,15 +12,22 @@ import { Icon } from "../icon";
 import type { TooltipProps } from "../tooltip";
 import { Tooltip } from "../tooltip";
 import * as Validators from "./input_validators";
-import type { InputValidator } from "./input_validators";
+import type { InputValidate, InputValidationResult, InputValidator } from "./input_validators";
 import isFunction from "lodash/isFunction";
 import uniqueId from "lodash/uniqueId";
 import { debounce } from "lodash";
 
-const { conditionalValidators, ...InputValidators } = Validators;
+const { conditionalValidators, isAsyncInputValidator, AsyncInputValidationError, ...InputValidators } = Validators;
 
-export { InputValidators };
-export type { InputValidator };
+export {
+  InputValidators,
+  AsyncInputValidationError,
+};
+export type {
+  InputValidator,
+  InputValidationResult,
+  InputValidate,
+};
 
 type InputElement = HTMLInputElement | HTMLTextAreaElement;
 type InputElementProps =
@@ -55,7 +62,7 @@ export type InputProps = Omit<InputElementProps, "onChange" | "onSubmit"> & {
   iconLeft?: IconData;
   iconRight?: IconData;
   contentRight?: string | React.ReactNode; // Any component of string goes after iconRight
-  validators?: InputValidator<boolean> | InputValidator<boolean>[];
+  validators?: InputValidator<boolean, boolean> | InputValidator<boolean, boolean>[];
   blurOnEnter?: boolean;
   onChange?(value: string, evt: React.ChangeEvent<InputElement>): void;
   onSubmit?(value: string, evt: React.KeyboardEvent<InputElement>): void;
@@ -78,15 +85,11 @@ const defaultProps: Partial<InputProps> = {
   blurOnEnter: true,
 };
 
-function isAsyncValidator(validator: InputValidator<boolean>): validator is InputValidator<true> {
-  return typeof validator.debounce === "number";
-}
-
 export class Input extends React.Component<InputProps, State> {
   static defaultProps = defaultProps as object;
 
   public input: InputElement | null = null;
-  public validators: InputValidator<boolean>[] = [];
+  public validators: InputValidator<boolean, boolean>[] = [];
 
   public state: State = {
     focused: false,
@@ -165,7 +168,7 @@ export class Input extends React.Component<InputProps, State> {
         break;
       }
 
-      if (isAsyncValidator(validator)) {
+      if (isAsyncInputValidator(validator)) {
         if (!validationId) {
           this.validationId = validationId = uniqueId("validation_id_");
         }
@@ -218,7 +221,7 @@ export class Input extends React.Component<InputProps, State> {
     });
   }
 
-  private getValidatorError(value: string, { message }: InputValidator<boolean>) {
+  private getValidatorError(value: string, { message }: InputValidator<boolean, boolean>) {
     if (isFunction(message)) return message(value, this.props);
 
     return message || "";
@@ -234,7 +237,7 @@ export class Input extends React.Component<InputProps, State> {
       ...persistentValidators,
       ...selfValidators,
     ].map((validator) => {
-      if (isAsyncValidator(validator)) {
+      if (isAsyncInputValidator(validator)) {
         validator.validate = debouncePromise(validator.validate, validator.debounce);
       }
 

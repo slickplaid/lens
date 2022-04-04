@@ -11,7 +11,23 @@ import { TypedRegEx } from "typed-regex";
 export class AsyncInputValidationError extends Error {
 }
 
-export type InputValidator<IsAsync extends boolean> = {
+export type InputValidationResult<IsAsync extends boolean> = (
+  IsAsync extends false
+    ? boolean
+    : IsAsync extends true
+      ? Promise<void>
+      : never
+);
+
+export type InputValidate<IsAsync extends boolean, RequireProps extends boolean> = (
+  RequireProps extends false
+    ? (value: string, props?: InputProps) => InputValidationResult<IsAsync>
+    : RequireProps extends true
+      ? (value: string, props: InputProps) => InputValidationResult<IsAsync>
+      : never
+);
+
+export type InputValidator<IsAsync extends boolean, RequireProps extends boolean> = {
   /**
    * Filters itself based on the input props
    */
@@ -19,23 +35,39 @@ export type InputValidator<IsAsync extends boolean> = {
 } & (
   IsAsync extends false
     ? {
-      validate: (value: string, props: InputProps) => boolean;
+      validate: InputValidate<false, RequireProps>;
       message: ReactNode | ((value: string, props: InputProps) => ReactNode | string);
       debounce?: undefined;
     }
-    : {
-      /**
-       * If asyncronous then the rejection message is the error message
-       *
-       * This function MUST reject with an instance of {@link AsyncInputValidationError}
-       */
-      validate: (value: string, props: InputProps) => Promise<void>;
-      message?: undefined;
-      debounce: number;
-    }
-  );
+    : IsAsync extends true
+      ? {
+        /**
+         * If asyncronous then the rejection message is the error message
+         *
+         * This function MUST reject with an instance of {@link AsyncInputValidationError}
+         */
+        validate: InputValidate<true, RequireProps>;
+        message?: undefined;
+        debounce: number;
+      }
+      : never
+);
 
-export function inputValidator<IsAsync extends boolean = false>(validator: InputValidator<IsAsync>): InputValidator<IsAsync> {
+export function isAsyncInputValidator<RequireProps extends boolean>(validator: InputValidator<boolean, RequireProps>): validator is InputValidator<true, RequireProps> {
+  return typeof validator.debounce === "number";
+}
+
+export function asyncInputValidator(validator: InputValidator<true, false>): InputValidator<true, false>;
+export function asyncInputValidator<RequireProps extends boolean>(validator: InputValidator<true, RequireProps>): InputValidator<true, RequireProps>;
+
+export function asyncInputValidator<RequireProps extends boolean>(validator: InputValidator<true, RequireProps>): InputValidator<true, RequireProps> {
+  return validator;
+}
+
+export function inputValidator(validator: InputValidator<false, false>): InputValidator<false, false>;
+export function inputValidator<RequireProps extends boolean>(validator: InputValidator<false, RequireProps>): InputValidator<false, RequireProps>;
+
+export function inputValidator<RequireProps extends boolean>(validator: InputValidator<false, RequireProps>): InputValidator<false, RequireProps> {
   return validator;
 }
 
@@ -51,7 +83,7 @@ export const isEmail = inputValidator({
   validate: value => !!value.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/),
 });
 
-export const isNumber = inputValidator({
+export const isNumber = inputValidator<true>({
   condition: ({ type }) => type === "number",
   message(value, { min, max }) {
     const minMax: string = [
@@ -100,7 +132,7 @@ export const isExtensionNameInstall = inputValidator({
   validate: value => isExtensionNameInstallRegex.isMatch(value),
 });
 
-export const isPath = inputValidator<true>({
+export const isPath = asyncInputValidator({
   debounce: 100,
   condition: ({ type }) => type === "text",
   validate: async value => {
@@ -112,14 +144,14 @@ export const isPath = inputValidator<true>({
   },
 });
 
-export const minLength = inputValidator({
+export const minLength = inputValidator<true>({
   condition: ({ minLength }) => !!minLength,
   message: (value, { minLength }) => `Minimum length is ${minLength}`,
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   validate: (value, { minLength }) => value.length >= minLength!,
 });
 
-export const maxLength = inputValidator({
+export const maxLength = inputValidator<true>({
   condition: ({ maxLength }) => !!maxLength,
   message: (value, { maxLength }) => `Maximum length is ${maxLength}`,
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -135,7 +167,7 @@ export const systemName = inputValidator({
 
 export const accountId = inputValidator({
   message: () => `Invalid account ID`,
-  validate: (value, props) => (isEmail.validate(value, props) || systemName.validate(value, props)),
+  validate: (value) => (isEmail.validate(value) || systemName.validate(value)),
 });
 
 export const conditionalValidators = [
