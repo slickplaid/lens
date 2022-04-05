@@ -15,8 +15,8 @@ import commandOverlayInjectable from "./command-overlay.injectable";
 import { isMac } from "../../../common/vars";
 import type { CatalogEntityRegistry } from "../../api/catalog/entity/registry";
 import { broadcastMessage, ipcRendererOn } from "../../../common/ipc";
-import type { Disposer } from "../../utils";
 import { withInjectables } from "@ogre-tools/injectable-react";
+import type { AddWindowEventListener } from "../../window/event-listener.injectable";
 import windowAddEventListenerInjectable from "../../window/event-listener.injectable";
 import type { IComputedValue } from "mobx";
 import matchedClusterIdInjectable from "../../navigation/matched-cluster-id.injectable";
@@ -24,10 +24,10 @@ import catalogEntityRegistryInjectable from "../../api/catalog/entity/registry.i
 import hostedClusterIdInjectable from "../../../common/cluster-store/hosted-cluster-id.injectable";
 
 interface Dependencies {
-  addWindowEventListener: <K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions) => Disposer;
+  addWindowEventListener: AddWindowEventListener;
   commandOverlay: CommandOverlay;
   clusterId?: ClusterId;
-  matchedClusterId: IComputedValue<ClusterId>;
+  matchedClusterId: IComputedValue<ClusterId | undefined>;
   entityRegistry: CatalogEntityRegistry;
 }
 

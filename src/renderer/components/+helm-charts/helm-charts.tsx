@@ -28,8 +28,8 @@ enum columnId {
 
 interface Dependencies {
   routeParameters: {
-    chartName: IComputedValue<string>;
-    repo: IComputedValue<string>;
+    chartName: IComputedValue<string | undefined>;
+    repo: IComputedValue<string | undefined>;
   };
 
   navigateToHelmCharts: NavigateToHelmCharts;
