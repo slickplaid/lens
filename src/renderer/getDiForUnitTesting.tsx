@@ -40,6 +40,7 @@ import lensResourcesDirInjectable from "../common/vars/lens-resources-dir.inject
 import broadcastMessageInjectable from "../common/ipc/broadcast-message.injectable";
 import { observable } from "mobx";
 import defaultShellInjectable from "./components/+preferences/default-shell.injectable";
+import packageJsonInjectable from "../common/vars/package-json.injectable";
 
 export const getDiForUnitTesting = (
   { doGeneralOverrides } = { doGeneralOverrides: false },
@@ -63,6 +64,7 @@ export const getDiForUnitTesting = (
     di.override(isMacInjectable, () => true);
     di.override(isWindowsInjectable, () => false);
     di.override(isLinuxInjectable, () => false);
+    di.override(packageJsonInjectable, () => ({}));
 
     di.override(getAbsolutePathInjectable, () => getAbsolutePathFake);
     di.override(joinPathsInjectable, () => joinPathsFake);
