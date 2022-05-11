@@ -20,7 +20,6 @@ import type { KubeJsonApiData } from "./kube-json-api";
 import { KubeJsonApi } from "./kube-json-api";
 import { noop, WrappedAbortController } from "../utils";
 import type { RequestInit } from "node-fetch";
-import type AbortController from "abort-controller";
 import type { AgentOptions } from "https";
 import { Agent } from "https";
 import type { Patch } from "rfc6902";

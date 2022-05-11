@@ -7,7 +7,6 @@ import type { Request } from "node-fetch";
 import { forRemoteCluster, KubeApi } from "../kube-api";
 import { KubeJsonApi } from "../kube-json-api";
 import { KubeObject } from "../kube-object";
-import AbortController from "abort-controller";
 import { delay } from "../../utils/delay";
 import { PassThrough } from "stream";
 import type { ApiManager } from "../api-manager";

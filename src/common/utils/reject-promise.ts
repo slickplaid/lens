@@ -3,8 +3,6 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import "abort-controller/polyfill";
-
 /**
  * Creates a new promise that will be rejected when the signal rejects.
  *

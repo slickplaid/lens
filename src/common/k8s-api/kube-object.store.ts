@@ -17,10 +17,6 @@ import { ensureObjectSelfLink } from "./kube-api";
 import { parseKubeApi } from "./kube-api-parse";
 import type { KubeJsonApiData } from "./kube-json-api";
 import type { RequestInit } from "node-fetch";
-
-// BUG: https://github.com/mysticatea/abort-controller/pull/22
-// eslint-disable-next-line import/no-named-as-default
-import AbortController from "abort-controller";
 import type { Patch } from "rfc6902";
 import logger from "../logger";
 
