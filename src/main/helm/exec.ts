@@ -4,7 +4,7 @@
  */
 
 import { promiseExecFile } from "../../common/utils/promise-exec";
-import type { BaseEncodingOptions } from "fs";
+import type { ObjectEncodingOptions } from "fs";
 import type { ExecFileOptions } from "child_process";
 import { helmBinaryPath } from "../../common/vars";
 import { UserStore } from "../../common/user-store";
@@ -13,7 +13,7 @@ import { UserStore } from "../../common/user-store";
  * ExecFile the bundled helm CLI
  * @returns STDOUT
  */
-export async function execHelm(args: string[], options?: BaseEncodingOptions & ExecFileOptions): Promise<string> {
+export async function execHelm(args: string[], options?: ObjectEncodingOptions & ExecFileOptions): Promise<string> {
   try {
     const opts = { ...options };
 

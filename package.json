@@ -52,7 +52,7 @@
     "sentryDsn": ""
   },
   "engines": {
-    "node": ">=14 <15"
+    "node": ">=16 <17"
   },
   "jest": {
     "collectCoverage": false,
@@ -304,7 +304,7 @@
     "@types/md5-file": "^4.0.2",
     "@types/mini-css-extract-plugin": "^2.4.0",
     "@types/mock-fs": "^4.13.1",
-    "@types/node": "14.18.17",
+    "@types/node": "^16.11.34",
     "@types/node-fetch": "^2.6.1",
     "@types/npm": "^2.0.32",
     "@types/proper-lockfile": "^4.1.2",
@@ -345,7 +345,7 @@
     "css-loader": "^6.7.1",
     "deepdash": "^5.3.9",
     "dompurify": "^2.3.6",
-    "electron": "^14.2.9",
+    "electron": "^18.2.1",
     "electron-builder": "^23.0.3",
     "electron-notarize": "^0.3.0",
     "esbuild": "^0.14.38",
