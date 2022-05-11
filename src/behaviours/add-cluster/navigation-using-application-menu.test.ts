@@ -5,8 +5,6 @@
 
 import type { RenderResult } from "@testing-library/react";
 import type { ApplicationBuilder } from "../../renderer/components/test-utils/get-application-builder";
-import { getApplicationBuilder } from "../../renderer/components/test-utils/get-application-builder";
-import isAutoUpdateEnabledInjectable from "../../main/update-app/is-auto-update-enabled.injectable";
 
 // TODO: Make components free of side effects by making them deterministic
 jest.mock("../../renderer/components/tooltip");
@@ -17,10 +15,6 @@ describe("add-cluster - navigation using application menu", () => {
   let rendered: RenderResult;
 
   beforeEach(async () => {
-    applicationBuilder = getApplicationBuilder().beforeApplicationStart(({ mainDi }) => {
-      mainDi.override(isAutoUpdateEnabledInjectable, () => () => false);
-    });
-
     rendered = await applicationBuilder.render();
   });
 

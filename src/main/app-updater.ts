@@ -39,14 +39,14 @@ autoUpdater.logger = {
 };
 
 interface Dependencies {
-  isAutoUpdateEnabled: () => boolean;
+  updatingIsEnabled: boolean;
 }
 
 /**
  * starts the automatic update checking
  */
-export const startUpdateChecking = ({ isAutoUpdateEnabled } : Dependencies) => once(function (interval = 1000 * 60 * 60 * 24): void {
-  if (!isAutoUpdateEnabled() || isTestEnv) {
+export const startUpdateChecking = ({ updatingIsEnabled } : Dependencies) => once(function (interval = 1000 * 60 * 60 * 24): void {
+  if (!updatingIsEnabled || isTestEnv) {
     return;
   }
 
