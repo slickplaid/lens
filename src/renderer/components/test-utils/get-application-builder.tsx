@@ -43,9 +43,9 @@ import clusterFrameContextInjectable from "../../cluster-frame-context/cluster-f
 import startMainApplicationInjectable from "../../../main/start-main-application/start-main-application.injectable";
 import startFrameInjectable from "../../start-frame/start-frame.injectable";
 import { flushPromises } from "../../../common/test-utils/flush-promises";
-import trayMenuItemsInjectable from "../../../main/tray/tray-menu-item/tray-menu-items.injectable";
 import type { TrayMenuItem } from "../../../main/tray/tray-menu-item/tray-menu-item-injection-token";
 import updateIsAvailableStateInjectable from "../../../main/update-app/update-is-ready-to-be-installed-state.injectable";
+import electronTrayInjectable from "../../../main/tray/electron-tray/electron-tray.injectable";
 
 type Callback = (dis: DiContainers) => void | Promise<void>;
 
@@ -148,6 +148,17 @@ export const getApplicationBuilder = () => {
     computed((): LensMainExtension[] => []),
   );
 
+  let trayMenuItemsStateFake: TrayMenuItem[];
+
+  mainDi.override(electronTrayInjectable, () => ({
+    start: () => {},
+    stop: () => {},
+
+    setMenuItems:   (items) => {
+      trayMenuItemsStateFake = items;
+    },
+  }));
+
   let allowedResourcesState: IObservableArray<KubeResource>;
   let rendered: RenderResult;
 
@@ -192,26 +203,18 @@ export const getApplicationBuilder = () => {
 
     tray: {
       get: (id: string) => {
-        const trayMenuItems = mainDi.inject(
-          trayMenuItemsInjectable,
-        );
-
-        return trayMenuItems.get().find(matches({ id }));
+        return trayMenuItemsStateFake.find(matches({ id }));
       },
 
       click: async (id: string) => {
-        const trayMenuItems = mainDi.inject(
-          trayMenuItemsInjectable,
-        );
-
         const menuItem = pipeline(
-          trayMenuItems.get(),
+          trayMenuItemsStateFake,
           find((menuItem) => menuItem.id === id),
         );
 
         if (!menuItem) {
           const availableIds = pipeline(
-            trayMenuItems.get(),
+            trayMenuItemsStateFake,
             filter(item => !!item.click),
             map(item => item.id),
             join(", "),
