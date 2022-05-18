@@ -6,8 +6,8 @@
 import { merge } from "lodash";
 import { action, makeObservable, observable } from "mobx";
 import type { PartialDeep } from "type-fest";
-import { BaseStore } from "./base-store";
-import logger from "./logger";
+import { BaseStore } from "../base-store";
+import logger from "../logger";
 
 export interface EntityPreferencesModel {
   /**

@@ -8,12 +8,20 @@ import { observer } from "mobx-react";
 import type { EntitySettingViewProps } from "../../../extensions/registries";
 import { SubTitle } from "../layout/sub-title";
 import { Input } from "../input";
-import { EntityPreferencesStore } from "../../../common/entity-preferences-store";
+import type { EntityPreferencesStore } from "../../../common/entity-preferences/store";
 import { computeDefaultShortName } from "../../../common/catalog/helpers";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import entityPreferencesStoreInjectable from "../../../common/entity-preferences/store.injectable";
 
-export const ShortNameSetting = observer(({ entity }: EntitySettingViewProps) => {
+interface Dependencies {
+  entityPreferencesStore: EntityPreferencesStore;
+}
+
+const NonInjectedShortNameSetting = observer(({
+  entity,
+  entityPreferencesStore,
+}: Dependencies & EntitySettingViewProps) => {
   const [shortName, setShortName] = useState(entity.metadata.shortName ?? "");
-  const store = EntityPreferencesStore.getInstance();
 
   return (
     <section>
@@ -24,7 +32,7 @@ export const ShortNameSetting = observer(({ entity }: EntitySettingViewProps) =>
           value={shortName}
           placeholder={computeDefaultShortName(entity.getName())}
           onChange={setShortName}
-          onBlur={() => store.mergePreferences(entity.getId(), { shortName })}
+          onBlur={() => entityPreferencesStore.mergePreferences(entity.getId(), { shortName })}
         />
         <small className="hint">
           The text for entity icons. By default it is calculated from the entity name.
@@ -32,4 +40,11 @@ export const ShortNameSetting = observer(({ entity }: EntitySettingViewProps) =>
       </section>
     </section>
   );
+});
+
+export const ShortNameSetting = withInjectables<Dependencies, EntitySettingViewProps>(NonInjectedShortNameSetting, {
+  getProps: (di, props) => ({
+    ...props,
+    entityPreferencesStore: di.inject(entityPreferencesStoreInjectable),
+  }),
 });
