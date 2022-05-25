@@ -3,7 +3,6 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable } from "@ogre-tools/injectable";
-import { channelListenerInjectionToken } from "../../common/channel/channel-listener-injection-token";
 import type { AskBooleanQuestionParameters } from "../../common/ask-boolean/ask-boolean-question-channel.injectable";
 import askBooleanQuestionChannelInjectable from "../../common/ask-boolean/ask-boolean-question-channel.injectable";
 import showInfoNotificationInjectable from "../components/notifications/show-info-notification.injectable";
@@ -12,6 +11,7 @@ import React from "react";
 import { messageToChannelInjectionToken } from "../../common/channel/message-to-channel-injection-token";
 import askBooleanAnswerChannelInjectable from "../../common/ask-boolean/ask-boolean-answer-channel.injectable";
 import notificationsStoreInjectable from "../components/notifications/notifications-store.injectable";
+import { messageChannelListenerInjectionToken } from "../../common/channel/message-channel-listener-injection-token";
 
 const askBooleanQuestionChannelListenerInjectable = getInjectable({
   id: "ask-boolean-question-channel-listener",
@@ -64,7 +64,7 @@ const askBooleanQuestionChannelListenerInjectable = getInjectable({
     };
   },
 
-  injectionToken: channelListenerInjectionToken,
+  injectionToken: messageChannelListenerInjectionToken,
 });
 
 export default askBooleanQuestionChannelListenerInjectable;

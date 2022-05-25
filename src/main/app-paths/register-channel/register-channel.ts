@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import type { IpcMain } from "electron";
-import type { Channel } from "../../../common/channel/channel-injection-token";
+import type { RequestChannel } from "../../../common/channel/request-channel-injection-token";
 
 interface Dependencies {
   ipcMain: IpcMain;
@@ -11,8 +11,8 @@ interface Dependencies {
 
 export const registerChannel =
   ({ ipcMain }: Dependencies) =>
-  <TChannel extends Channel<unknown, unknown>>(
+  <TChannel extends RequestChannel<unknown, unknown>>(
       channel: TChannel,
-      getValue: () => TChannel["_messageTemplate"],
+      getValue: () => TChannel["_responseSignature"],
     ) =>
       ipcMain.handle(channel.id, getValue);

@@ -3,8 +3,8 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable } from "@ogre-tools/injectable";
-import { channelInjectionToken } from "../channel/channel-injection-token";
 import type { RequestChannel } from "../channel/request-channel-injection-token";
+import { requestChannelInjectionToken } from "../channel/request-channel-injection-token";
 
 export type SyncBoxInitialValueChannel = RequestChannel<
   void,
@@ -18,7 +18,7 @@ const syncBoxInitialValueChannelInjectable = getInjectable({
     id: "sync-box-initial-value-channel",
   }),
 
-  injectionToken: channelInjectionToken,
+  injectionToken: requestChannelInjectionToken,
 });
 
 export default syncBoxInitialValueChannelInjectable;

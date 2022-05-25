@@ -3,10 +3,10 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable } from "@ogre-tools/injectable";
-import { channelListenerInjectionToken } from "../../common/channel/channel-listener-injection-token";
 import type { ApplicationUpdateStatusEventId } from "../../common/application-update/application-update-status-channel.injectable";
 import applicationUpdateStatusChannelInjectable from "../../common/application-update/application-update-status-channel.injectable";
 import showInfoNotificationInjectable from "../components/notifications/show-info-notification.injectable";
+import { messageChannelListenerInjectionToken } from "../../common/channel/message-channel-listener-injection-token";
 
 const applicationUpdateStatusListenerInjectable = getInjectable({
   id: "application-update-status-listener",
@@ -50,7 +50,7 @@ const applicationUpdateStatusListenerInjectable = getInjectable({
     };
   },
 
-  injectionToken: channelListenerInjectionToken,
+  injectionToken: messageChannelListenerInjectionToken,
 });
 
 export default applicationUpdateStatusListenerInjectable;

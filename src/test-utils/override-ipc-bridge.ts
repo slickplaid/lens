@@ -9,10 +9,11 @@ import asyncFn from "@async-fn/jest";
 import type { SendToViewArgs } from "../main/start-main-application/lens-window/application-window/lens-window-injection-token";
 import sendToChannelInElectronBrowserWindowInjectable from "../main/start-main-application/lens-window/application-window/send-to-channel-in-electron-browser-window.injectable";
 import { isEmpty } from "lodash/fp";
-import enlistChannelListenerInjectableInRenderer from "../renderer/channel/channel-listeners/enlist-message-channel-listener.injectable";
-import enlistChannelListenerInjectableInMain from "../main/channel/channel-listeners/enlist-message-channel-listener.injectable";
+import enlistMessageChannelListenerInjectableInRenderer from "../renderer/channel/channel-listeners/enlist-message-channel-listener.injectable";
+import enlistMessageChannelListenerInjectableInMain from "../main/channel/channel-listeners/enlist-message-channel-listener.injectable";
+import enlistRequestChannelListenerInjectableInMain from "../main/channel/channel-listeners/enlist-request-channel-listener.injectable";
 import sendToMainInjectable from "../renderer/channel/send-to-main.injectable";
-import type { Channel } from "../common/channel/channel-injection-token";
+import type { RequestChannel } from "../common/channel/request-channel-injection-token";
 
 export const overrideIpcBridge = ({
   rendererDi,
@@ -21,125 +22,144 @@ export const overrideIpcBridge = ({
   rendererDi: DiContainer;
   mainDi: DiContainer;
 }) => {
-  const fakeChannelMap = new Map<
+  const fakeRequestChannelMap = new Map<
     string,
     { promise: Promise<any>; resolve: (arg0: any) => Promise<void> }
   >();
 
-  const mainIpcRegistrations = {
-    set: <TChannel extends Channel<unknown, unknown>>(
+  const requestChannelListenerFakesForMain = {
+    set: <TChannel extends RequestChannel<unknown, unknown>>(
       channel: TChannel,
-      callback: () => TChannel["_messageTemplate"],
+      callback: () => TChannel["_responseSignature"],
     ) => {
       const id = channel.id;
 
-      if (!fakeChannelMap.has(id)) {
+      if (!fakeRequestChannelMap.has(id)) {
         const mockInstance = asyncFn();
 
-        fakeChannelMap.set(id, {
+        fakeRequestChannelMap.set(id, {
           promise: mockInstance(),
           resolve: mockInstance.resolve,
         });
       }
 
-      return fakeChannelMap.get(id)?.resolve(callback);
+      return fakeRequestChannelMap.get(id)?.resolve(callback);
     },
 
-    get: <TChannel extends Channel<unknown, unknown>>(channel: TChannel) => {
+    get: <TChannel extends RequestChannel<unknown, unknown>>(channel: TChannel) => {
       const id = channel.id;
 
-      if (!fakeChannelMap.has(id)) {
+      if (!fakeRequestChannelMap.has(id)) {
         const mockInstance = asyncFn();
 
-        fakeChannelMap.set(id, {
+        fakeRequestChannelMap.set(id, {
           promise: mockInstance(),
           resolve: mockInstance.resolve,
         });
       }
 
-      return fakeChannelMap.get(id)?.promise;
+      return fakeRequestChannelMap.get(id)?.promise;
     },
   };
 
-  // TODO: Consolidate to using mainIpcFakeHandles
   rendererDi.override(
     getValueFromChannelInjectable,
+
     () => async (channel) => {
-      const callback = await mainIpcRegistrations.get(channel);
+      const callback = await requestChannelListenerFakesForMain.get(channel);
 
       return callback();
     },
   );
 
-  mainDi.override(registerChannelInjectable, () => (channel, callback) => {
-    mainIpcRegistrations.set(channel, callback);
+  mainDi.override(registerChannelInjectable, () => (channel, listener) => {
+    requestChannelListenerFakesForMain.set(channel, listener);
   });
 
-  const rendererIpcFakeHandles = new Map<
+  const messageChannelListenerFakesForRenderer = new Map<
     string,
     ((...args: any[]) => void)[]
   >();
 
   mainDi.override(
     sendToChannelInElectronBrowserWindowInjectable,
+
     () =>
       (browserWindow, { channel: channelName, data = [] }: SendToViewArgs) => {
-        const handles = rendererIpcFakeHandles.get(channelName) || [];
+        const listeners = messageChannelListenerFakesForRenderer.get(channelName) || [];
 
-        if (isEmpty(handles)) {
+        if (isEmpty(listeners)) {
           throw new Error(
             `Tried to send message to channel "${channelName}" but there where no listeners. Current channels with listeners: "${[
-              ...rendererIpcFakeHandles.keys(),
+              ...messageChannelListenerFakesForRenderer.keys(),
             ].join('", "')}"`,
           );
         }
 
-        handles.forEach((handle) => handle(...data));
+        listeners.forEach((handle) => handle(...data));
       },
   );
 
-  const mainIpcFakeHandles = new Map<
+  const messageChannelListenerFakesForMain = new Map<
     string,
     ((...args: any[]) => void)[]
   >();
 
+  const requestChannelListenerFakesForMain = new Map<
+    string,
+    ((...args: any[]) => any)[]
+  >();
+
   rendererDi.override(
-    enlistChannelListenerInjectableInRenderer,
-    () => (channel, handler) => {
-      const existingHandles = rendererIpcFakeHandles.get(channel.id) || [];
+    enlistMessageChannelListenerInjectableInRenderer,
 
-      rendererIpcFakeHandles.set(channel.id, [...existingHandles, handler]);
+    () =>
+      ({ channel, handler: newListener }) => {
+        const oldListeners = messageChannelListenerFakesForRenderer.get(channel.id) || [];
 
-      return () => {
+        messageChannelListenerFakesForRenderer.set(channel.id, [...oldListeners, newListener]);
 
-      };
-    },
+        return () => {};
+      },
   );
 
   rendererDi.override(sendToMainInjectable, () => (channelId, message) => {
-    const handles = mainIpcFakeHandles.get(channelId) || [];
+    const listeners = messageChannelListenerFakesForMain.get(channelId) || [];
 
-    if (isEmpty(handles)) {
+    if (isEmpty(listeners)) {
       throw new Error(
         `Tried to send message to channel "${channelId}" but there where no listeners. Current channels with listeners: "${[
-          ...mainIpcFakeHandles.keys(),
+          ...messageChannelListenerFakesForMain.keys(),
         ].join('", "')}"`,
       );
     }
 
-    handles.forEach((handle) => handle(message));
+    listeners.forEach((handle) => handle(message));
   });
 
   mainDi.override(
-    enlistChannelListenerInjectableInMain,
-    () => (channel, handler) => {
-      const existingHandles = mainIpcFakeHandles.get(channel.id) || [];
+    enlistMessageChannelListenerInjectableInMain,
 
-      mainIpcFakeHandles.set(channel.id, [...existingHandles, handler]);
+    () =>
+      ({ channel, handler: newListener }) => {
+        const oldListeners = messageChannelListenerFakesForMain.get(channel.id) || [];
 
-      return () => {
+        messageChannelListenerFakesForMain.set(channel.id, [...oldListeners, newListener]);
 
-      };
-    },
+        return () => {};
+      },
+  );
+
+  mainDi.override(
+    enlistRequestChannelListenerInjectableInMain,
+
+    () =>
+      ({ channel, handler }) => {
+        // const existingHandles = mainIpcFakeHandles.get(channel.id) || [];
+
+        // mainIpcFakeHandles.set(channel.id, [...existingHandles, handler]);
+
+        return () => {};
+      },
   );
 };

@@ -3,9 +3,9 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable } from "@ogre-tools/injectable";
-import { channelListenerInjectionToken } from "../../common/channel/channel-listener-injection-token";
 import askBooleanAnswerChannelInjectable from "../../common/ask-boolean/ask-boolean-answer-channel.injectable";
 import askBooleanPromiseInjectable from "./ask-boolean-promise.injectable";
+import { messageChannelListenerInjectionToken } from "../../common/channel/message-channel-listener-injection-token";
 
 const askBooleanAnswerChannelListenerInjectable = getInjectable({
   id: "ask-boolean-answer-channel-listener",
@@ -20,7 +20,7 @@ const askBooleanAnswerChannelListenerInjectable = getInjectable({
     },
   }),
 
-  injectionToken: channelListenerInjectionToken,
+  injectionToken: messageChannelListenerInjectionToken,
 });
 
 export default askBooleanAnswerChannelListenerInjectable;

@@ -9,12 +9,12 @@ import { lensWindowInjectionToken } from "../../main/start-main-application/lens
 import type { MessageToChannel } from "./message-to-channel-injection-token";
 import { messageToChannelInjectionToken } from "./message-to-channel-injection-token";
 import { getApplicationBuilder } from "../../renderer/components/test-utils/get-application-builder";
-import { channelListenerInjectionToken } from "./channel-listener-injection-token";
 import createLensWindowInjectable from "../../main/start-main-application/lens-window/application-window/create-lens-window.injectable";
-import type { Channel } from "./channel-injection-token";
 import closeAllWindowsInjectable from "../../main/start-main-application/lens-window/hide-all-windows/close-all-windows.injectable";
+import { messageChannelListenerInjectionToken } from "./message-channel-listener-injection-token";
+import type { MessageChannel } from "./message-channel-injection-token";
 
-type TestChannel = Channel<string>;
+type TestChannel = MessageChannel<string>;
 
 describe("channel", () => {
   describe("messaging from main to renderer, given listener for channel in a window and application has started", () => {
@@ -40,7 +40,7 @@ describe("channel", () => {
           handler: testListenerInWindowMock,
         }),
 
-        injectionToken: channelListenerInjectionToken,
+        injectionToken: messageChannelListenerInjectionToken,
       });
 
       rendererDi.register(testChannelListenerInTestWindowInjectable);
@@ -126,7 +126,7 @@ describe("channel", () => {
           handler: testListenerInMainMock,
         }),
 
-        injectionToken: channelListenerInjectionToken,
+        injectionToken: messageChannelListenerInjectionToken,
       });
 
       mainDi.register(testChannelListenerInMainInjectable);
