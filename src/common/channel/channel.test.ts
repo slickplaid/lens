@@ -6,8 +6,8 @@ import type { DiContainer } from "@ogre-tools/injectable";
 import { getInjectable } from "@ogre-tools/injectable";
 import type { LensWindow } from "../../main/start-main-application/lens-window/application-window/lens-window-injection-token";
 import { lensWindowInjectionToken } from "../../main/start-main-application/lens-window/application-window/lens-window-injection-token";
-import type { SendToChannel } from "./send-to-channel-injection-token";
-import { sendToChannelInjectionToken } from "./send-to-channel-injection-token";
+import type { MessageToChannel } from "./message-to-channel-injection-token";
+import { messageToChannelInjectionToken } from "./message-to-channel-injection-token";
 import { getApplicationBuilder } from "../../renderer/components/test-utils/get-application-builder";
 import { channelListenerInjectionToken } from "./channel-listener-injection-token";
 import createLensWindowInjectable from "../../main/start-main-application/lens-window/application-window/create-lens-window.injectable";
@@ -21,7 +21,7 @@ describe("channel", () => {
     let testChannel: TestChannel;
     let testListenerInWindowMock: jest.Mock;
     let mainDi: DiContainer;
-    let sendToChannel: SendToChannel;
+    let messageToChannel: MessageToChannel;
 
     beforeEach(async () => {
       const applicationBuilder = getApplicationBuilder();
@@ -51,8 +51,8 @@ describe("channel", () => {
 
       testChannel = mainDi.inject(testChannelInjectable);
 
-      sendToChannel = mainDi.inject(
-        sendToChannelInjectionToken,
+      messageToChannel = mainDi.inject(
+        messageToChannelInjectionToken,
       );
 
       await applicationBuilder.render();
@@ -72,7 +72,7 @@ describe("channel", () => {
       });
 
       it("when sending message, triggers listener in window", () => {
-        sendToChannel(testChannel, "some-message");
+        messageToChannel(testChannel, "some-message");
 
         expect(testListenerInWindowMock).toHaveBeenCalledWith("some-message");
       });
@@ -80,7 +80,7 @@ describe("channel", () => {
       it("given window is hidden, when sending message, does not trigger listener in window", () => {
         someWindowFake.close();
 
-        sendToChannel(testChannel, "some-message");
+        messageToChannel(testChannel, "some-message");
 
         expect(testListenerInWindowMock).not.toHaveBeenCalled();
       });
@@ -93,7 +93,7 @@ describe("channel", () => {
       await someWindowFake.show();
       await someOtherWindowFake.show();
 
-      sendToChannel(testChannel, "some-message");
+      messageToChannel(testChannel, "some-message");
 
       expect(testListenerInWindowMock.mock.calls).toEqual([
         ["some-message"],
@@ -107,7 +107,7 @@ describe("channel", () => {
     let testListenerInMainMock: jest.Mock;
     let rendererDi: DiContainer;
     let mainDi: DiContainer;
-    let sendToChannel: SendToChannel;
+    let messageToChannel: MessageToChannel;
 
     beforeEach(async () => {
       const applicationBuilder = getApplicationBuilder();
@@ -137,15 +137,15 @@ describe("channel", () => {
 
       testChannel = rendererDi.inject(testChannelInjectable);
 
-      sendToChannel = rendererDi.inject(
-        sendToChannelInjectionToken,
+      messageToChannel = rendererDi.inject(
+        messageToChannelInjectionToken,
       );
 
       await applicationBuilder.render();
     });
 
     it("when sending message, triggers listener in main", () => {
-      sendToChannel(testChannel, "some-message");
+      messageToChannel(testChannel, "some-message");
 
       expect(testListenerInMainMock).toHaveBeenCalledWith("some-message");
     });

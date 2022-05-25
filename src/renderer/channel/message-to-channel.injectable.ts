@@ -3,11 +3,11 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable } from "@ogre-tools/injectable";
-import { sendToChannelInjectionToken } from "../../common/channel/send-to-channel-injection-token";
+import { messageToChannelInjectionToken } from "../../common/channel/message-to-channel-injection-token";
 import sendToMainInjectable from "./send-to-main.injectable";
 
-const sendToChannelInjectable = getInjectable({
-  id: "send-to-channel",
+const messageToChannelInjectable = getInjectable({
+  id: "message-to-channel",
 
   instantiate: (di) => {
     const sendToMain = di.inject(sendToMainInjectable);
@@ -17,7 +17,7 @@ const sendToChannelInjectable = getInjectable({
     };
   },
 
-  injectionToken: sendToChannelInjectionToken,
+  injectionToken: messageToChannelInjectionToken,
 });
 
-export default sendToChannelInjectable;
+export default messageToChannelInjectable;

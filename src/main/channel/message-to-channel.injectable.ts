@@ -6,10 +6,10 @@ import { lensWindowInjectionToken } from "../start-main-application/lens-window/
 import { pipeline } from "@ogre-tools/fp";
 import { getInjectable } from "@ogre-tools/injectable";
 import { filter } from "lodash/fp";
-import { sendToChannelInjectionToken } from "../../common/channel/send-to-channel-injection-token";
+import { messageToChannelInjectionToken } from "../../common/channel/message-to-channel-injection-token";
 
-const sendToChannelInjectable = getInjectable({
-  id: "send-to-channel",
+const messageToChannelInjectable = getInjectable({
+  id: "message-to-channel",
 
   instantiate: (di) => {
     const getAllLensWindows = () => di.injectMany(lensWindowInjectionToken);
@@ -26,7 +26,7 @@ const sendToChannelInjectable = getInjectable({
     };
   },
 
-  injectionToken: sendToChannelInjectionToken,
+  injectionToken: messageToChannelInjectionToken,
 });
 
-export default sendToChannelInjectable;
+export default messageToChannelInjectable;

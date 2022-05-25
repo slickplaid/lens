@@ -9,8 +9,8 @@ import asyncFn from "@async-fn/jest";
 import type { SendToViewArgs } from "../main/start-main-application/lens-window/application-window/lens-window-injection-token";
 import sendToChannelInElectronBrowserWindowInjectable from "../main/start-main-application/lens-window/application-window/send-to-channel-in-electron-browser-window.injectable";
 import { isEmpty } from "lodash/fp";
-import enlistChannelListenerInjectableInRenderer from "../renderer/channel/channel-listeners/enlist-channel-listener.injectable";
-import enlistChannelListenerInjectableInMain from "../main/channel/channel-listeners/enlist-channel-listener.injectable";
+import enlistChannelListenerInjectableInRenderer from "../renderer/channel/channel-listeners/enlist-message-channel-listener.injectable";
+import enlistChannelListenerInjectableInMain from "../main/channel/channel-listeners/enlist-message-channel-listener.injectable";
 import sendToMainInjectable from "../renderer/channel/send-to-main.injectable";
 import type { Channel } from "../common/channel/channel-injection-token";
 

@@ -9,7 +9,7 @@ import askBooleanQuestionChannelInjectable from "../../common/ask-boolean/ask-bo
 import showInfoNotificationInjectable from "../components/notifications/show-info-notification.injectable";
 import { Button } from "../components/button";
 import React from "react";
-import { sendToChannelInjectionToken } from "../../common/channel/send-to-channel-injection-token";
+import { messageToChannelInjectionToken } from "../../common/channel/message-to-channel-injection-token";
 import askBooleanAnswerChannelInjectable from "../../common/ask-boolean/ask-boolean-answer-channel.injectable";
 import notificationsStoreInjectable from "../components/notifications/notifications-store.injectable";
 
@@ -19,12 +19,12 @@ const askBooleanQuestionChannelListenerInjectable = getInjectable({
   instantiate: (di) => {
     const questionChannel = di.inject(askBooleanQuestionChannelInjectable);
     const showInfoNotification = di.inject(showInfoNotificationInjectable);
-    const sendToChannel = di.inject(sendToChannelInjectionToken);
+    const messageToChannel = di.inject(messageToChannelInjectionToken);
     const answerChannel = di.inject(askBooleanAnswerChannelInjectable);
     const notificationsStore = di.inject(notificationsStoreInjectable);
 
     const sendAnswerFor = (id: string) => (value: boolean) => {
-      sendToChannel(answerChannel, { id, value });
+      messageToChannel(answerChannel, { id, value });
     };
 
     const closeNotification = (notificationId: string) => {

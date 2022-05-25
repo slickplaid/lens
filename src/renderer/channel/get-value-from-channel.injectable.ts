@@ -4,7 +4,7 @@
  */
 import { getInjectable } from "@ogre-tools/injectable";
 import ipcRendererInjectable from "./ipc-renderer.injectable";
-import type { Channel } from "../../common/channel/channel-injection-token";
+import type { RequestChannel } from "../../common/channel/request-channel-injection-token";
 
 const getValueFromChannelInjectable = getInjectable({
   id: "get-value-from-channel",
@@ -12,10 +12,9 @@ const getValueFromChannelInjectable = getInjectable({
   instantiate: (di) => {
     const ipcRenderer = di.inject(ipcRendererInjectable);
 
-    return  <TChannel extends Channel<unknown, unknown>>(
+    return <TChannel extends RequestChannel<unknown, unknown>>(
       channel: TChannel,
-    ): Promise<TChannel["_returnTemplate"]> =>
-      ipcRenderer.invoke(channel.id);
+    ): Promise<Required<TChannel>["_responseSignature"]> => ipcRenderer.invoke(channel.id);
   },
 });
 
