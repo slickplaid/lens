@@ -52,6 +52,7 @@ import { getDiForUnitTesting as getMainDi } from "../../../main/getDiForUnitTest
 import { overrideChannels } from "../../../test-utils/channel-fakes/override-channels";
 import type { TrayMenuItem } from "../../../main/tray/tray-menu-item/tray-menu-item-injection-token";
 import trayIconPathsInjectable from "../../../main/tray/tray-icon-path.injectable";
+import randomBytesInjectable from "../../../main/utils/random-bytes.injectable";
 
 type Callback = (dis: DiContainers) => void | Promise<void>;
 
@@ -121,6 +122,21 @@ export const getApplicationBuilder = () => {
   rendererDi.override(clusterStoreInjectable, () => clusterStoreStub);
   rendererDi.override(storesAndApisCanBeCreatedInjectable, () => true);
   mainDi.override(clusterStoreInjectable, () => clusterStoreStub);
+
+  mainDi.override(randomBytesInjectable, () => {
+    let callId = 0;
+
+    return async (count) => {
+      const currentCallId = callId += 1;
+      const values = new Array(count);
+
+      for (let i = 0; i < count; i += 1) {
+        values[i] = ((i + currentCallId) << 2) ^ currentCallId;
+      }
+
+      return Buffer.from(values);
+    };
+  });
 
   const beforeApplicationStartCallbacks: Callback[] = [];
   const beforeRenderCallbacks: Callback[] = [];
