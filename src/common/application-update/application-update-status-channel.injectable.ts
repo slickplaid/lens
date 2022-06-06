@@ -7,13 +7,18 @@ import type { MessageChannel } from "../utils/channel/message-channel-injection-
 import { messageChannelInjectionToken } from "../utils/channel/message-channel-injection-token";
 
 export type ApplicationUpdateStatusEventId =
-      | "checking-for-updates"
-      | "no-updates-available"
-      | "download-for-update-started"
-      | "download-for-update-failed";
+  "checking-for-updates"
+  | "no-updates-available"
+  | "download-for-update-started"
+  | "download-for-update-failed";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type ApplicationUpdateStatusChannelMessage = { eventId: ApplicationUpdateStatusEventId; version?: string };
+export type ApplicationUpdateStatusChannelMessage = {
+  eventId: "checking-for-updates" | "no-updates-available" | "download-for-update-failed";
+} | {
+  eventId: "download-for-update-started";
+  version: string;
+};
+
 export type ApplicationUpdateStatusChannel = MessageChannel<ApplicationUpdateStatusChannelMessage>;
 
 const applicationUpdateStatusChannelInjectable = getInjectable({

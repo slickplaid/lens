@@ -50,7 +50,7 @@ const applicationWindowInjectable = getInjectable({
           ipcMain.once(bundledExtensionsLoaded, () => resolve());
         });
 
-        await Promise.race([viewHasLoaded, new Promise(resolve => setTimeout(resolve, 20_000))]);
+        await viewHasLoaded;
         await delay(50); // wait just a bit longer to let the first round of rendering happen
       },
     });
