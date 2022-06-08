@@ -6,7 +6,7 @@ import { getInjectionToken } from "@ogre-tools/injectable";
 import type { IComputedValue } from "mobx";
 import type { LensRendererExtension } from "../../extensions/lens-renderer-extension";
 
-export const routeInjectionToken = getInjectionToken<Route<unknown>>({
+export const routeInjectionToken = getInjectionToken<Route<object>>({
   id: "route-injection-token",
 });
 
