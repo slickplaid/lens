@@ -19,7 +19,7 @@ const messageToChannelInjectable = getInjectable({
           continue;
         }
 
-        window.send({ channel: channel.id, data: message !== undefined ? [message] : [] });
+        window.send({ channel: channel.id, data: message });
       }
     }) as MessageToChannel;
   },
